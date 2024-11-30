@@ -2,6 +2,7 @@ package com.surya.easyshop.controller;
 
 
 import com.surya.easyshop.dto.ProductDto;
+import com.surya.easyshop.exception.AlreadyExistsException;
 import com.surya.easyshop.exception.ResourceNotFoundException;
 import com.surya.easyshop.model.Product;
 import com.surya.easyshop.request.AddProductRequest;
@@ -15,9 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -53,8 +52,8 @@ public class ProductController {
             Product theProduct = productService.addProduct(product);
             ProductDto productDto = productService.convretToDto(theProduct);
             return ResponseEntity.ok(new ApiResponse("Add Product Success" , productDto));
-        } catch (Exception e) {
-            return  ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage() , null));
+        } catch (AlreadyExistsException e) {
+            return  ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage() , null));
         }
 
     }

@@ -2,6 +2,7 @@ package com.surya.easyshop.service;
 
 import com.surya.easyshop.exception.ResourceNotFoundException;
 import com.surya.easyshop.model.Cart;
+import com.surya.easyshop.model.User;
 import com.surya.easyshop.repository.CartItemRepository;
 import com.surya.easyshop.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -37,8 +39,10 @@ public class CartServiceImpl implements CartService{
     public void clearCart(Long id) {
         Cart cart = getCart(id);
         cartItemRepository.deleteAllByCartId(id);
-        cart.getItems().clear();
+        cart.clearCart();
         cartRepository.deleteById(id);
+
+
     }
 
 
@@ -51,11 +55,14 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public Long initializeNewCart()
+    public Cart initializeNewCart(User user)
     {
-        Cart newCart =  new Cart();
-        Long newCartId = cartIdGenerator.incrementAndGet();
-        return cartRepository.save(newCart).getId();
+        return Optional.ofNullable(getCartByUserId(user.getId()))
+                .orElseGet(() -> {
+                    Cart cart = new Cart();
+                    cart.setUser(user);
+                    return cartRepository.save(cart);
+                });
     }
 
     @Override

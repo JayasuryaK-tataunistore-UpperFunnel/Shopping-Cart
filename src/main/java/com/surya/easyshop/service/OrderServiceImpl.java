@@ -4,6 +4,7 @@ import com.surya.easyshop.dto.OrderDto;
 import com.surya.easyshop.enums.OrderStatus;
 import com.surya.easyshop.exception.ResourceNotFoundException;
 import com.surya.easyshop.model.*;
+import com.surya.easyshop.repository.CartRepository;
 import com.surya.easyshop.repository.OrderRepository;
 import com.surya.easyshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +25,8 @@ public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+
+    private final CartRepository cartRepository;
 
     private final CartService cartService;
     private final ModelMapper modelMapper;
@@ -40,6 +42,7 @@ public class OrderServiceImpl implements OrderService{
         order.setTotalAmount(calculateTotalAmount(orderItemList));
         Order savedOrder = orderRepository.save(order);
         cartService.clearCart(cart.getId());
+        cartRepository.deleteById(cart.getId());
 
 
         return savedOrder;
@@ -97,7 +100,8 @@ public class OrderServiceImpl implements OrderService{
                 .collect(Collectors.toList());
     }
 
-    private OrderDto convertToDto(Order order)
+    @Override
+    public OrderDto convertToDto(Order order)
     {
         return modelMapper.map(order , OrderDto.class);
     }

@@ -2,6 +2,7 @@ package com.surya.easyshop.service;
 
 import com.surya.easyshop.dto.ImageDto;
 import com.surya.easyshop.dto.ProductDto;
+import com.surya.easyshop.exception.AlreadyExistsException;
 import com.surya.easyshop.exception.ResourceNotFoundException;
 import com.surya.easyshop.model.Category;
 import com.surya.easyshop.model.Image;
@@ -40,7 +41,9 @@ public class ProductServiceImpl implements ProductService{
 
         // true use it else save new cat and use it to save product
 
-
+        if(productExists(request.getName() , request.getBrand())){
+            throw new AlreadyExistsException(request.getBrand() + " "+ request.getName()+ " already exits");
+        }
 
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
@@ -51,6 +54,11 @@ public class ProductServiceImpl implements ProductService{
 
 
         return productRepository.save(createProduct(request ,category));
+    }
+
+    private boolean productExists(String name , String brand)
+    {
+        return productRepository.existsByNameAndBrand(name ,brand);
     }
 
     private Product createProduct(AddProductRequest request, Category category) {
