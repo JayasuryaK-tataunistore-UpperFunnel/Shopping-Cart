@@ -1,5 +1,6 @@
 package com.surya.easyshop.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +11,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Category {
@@ -20,6 +20,11 @@ public class Category {
     private Long id ;
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "category")
     List<Product> products;
+
+    public Category(String name) {
+        this.name = name;
+    }
 }
