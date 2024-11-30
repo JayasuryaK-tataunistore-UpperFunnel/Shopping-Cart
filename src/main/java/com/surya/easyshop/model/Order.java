@@ -2,6 +2,7 @@ package com.surya.easyshop.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.surya.easyshop.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
