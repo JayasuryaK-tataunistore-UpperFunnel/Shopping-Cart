@@ -12,6 +12,7 @@ import com.surya.easyshop.service.ProductService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,31 +47,33 @@ public class ProductController {
     }
 
 
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addProduct(@RequestBody AddProductRequest product){
+    public ResponseEntity<ApiResponse> addProduct(@RequestBody AddProductRequest product) {
         try {
             Product theProduct = productService.addProduct(product);
             ProductDto productDto = productService.convretToDto(theProduct);
-            return ResponseEntity.ok(new ApiResponse("Add Product Success" , productDto));
+            return ResponseEntity.ok(new ApiResponse("Add product success!", productDto));
         } catch (AlreadyExistsException e) {
-            return  ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage() , null));
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
         }
-
     }
 
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/product/{productId}/update")
-    public ResponseEntity<ApiResponse> updateProduct(@RequestBody ProductUpdateRequest request , @PathVariable Long productId)
-    {
+    public  ResponseEntity<ApiResponse> updateProduct(@RequestBody ProductUpdateRequest request, @PathVariable Long productId) {
         try {
-            Product product = productService.updateProduct(request , productId);
-
-            return ResponseEntity.ok(new ApiResponse("Update Product Success" , product));
+            Product theProduct = productService.updateProduct(request, productId);
+            ProductDto productDto = productService.convretToDto(theProduct);
+            return ResponseEntity.ok(new ApiResponse("Update product success!", productDto));
         } catch (ResourceNotFoundException e) {
-            return  ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage() , null));
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/product/{id}/delete")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id)
     {
